@@ -1,4 +1,5 @@
 import sqlite3
+import aiosqlite
 
 db = sqlite3.connect('tg.db')
 cur = db.cursor()
@@ -91,6 +92,20 @@ async def save_brawl_stars_name_2(brawl_name, user_id):
 async def save_brawl_stars_name_3(brawl_name, user_id):
     cur.execute("UPDATE accounts SET brawl_name_3 = ? WHERE user_id = ?", (brawl_name, user_id))
     db.commit()
+
+async def clear_all_cells():
+    async with aiosqlite.connect('tg.db') as db:
+        async with db.cursor() as cur:
+            # Получаем все имена таблиц
+            await cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            tables = await cur.fetchall()
+
+            for table in tables:
+                # Удаляем все строки из каждой таблицы
+                await cur.execute(f"DELETE FROM {table[0]};")
+            
+            await db.commit()
+
 
 
 
